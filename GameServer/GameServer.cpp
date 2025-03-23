@@ -6,50 +6,85 @@
 #include <atomic>
 #include <mutex>
 
-vector<int32> vec;
-mutex m;
 
-template<typename T>
-class LockGuard
+class SpinLock
 {
 public:
-	LockGuard(T& m)
+	//lock_guard와 인터페이스 같아야 하므로 소문자 lock
+	void lock()
 	{
-		_mutex = &m;
-		_mutex->lock();
+		//while (_locked)
+		//{
+
+		//}
+		//_locked = true;
+
+		//CAS로 해결
+		bool expected = false;
+		bool desired = true;
+
+		//의사 코드
+		//if (_locked == expected)
+		//{
+		//	expected = _locked;
+		//	_locked = desired;
+		//	return true;
+		//}
+		//else
+		//{
+		//	expected = _locked;
+		//	return false;
+		//}
+
+		//실패하면 계속 시도해라
+		while (_locked.compare_exchange_strong(expected, desired) == false)
+		{
+			//함수 인자를 레퍼런스로 받아서 값이 바뀌므로 다시 초기값으로 세팅
+			expected = false;
+		}
+
+
+			
 	}
-	~LockGuard()
+	void unlock()
 	{
-		_mutex->unlock();
+		//_locked = false;
+		_locked.store(false);//atomic 함수를 사용하여 변경
 	}
 private:
-	T* _mutex;
+	//volatile bool _locked = false;//단순 컴파일러 최적화 하지 마라
+	atomic<bool> _locked = false; //volatile 기능을 하고 있다.
 };
 
-void Push()
+int32 sum = 0;
+mutex m;
+SpinLock spingLock;
+void Add()
 {
-	//stl은 멀티스레드 지원 안함
-	//1.벡터 재할당문제, 백테 삽입 위치 문제
-	for (int32 i = 0; i < 10000; ++i)
+	for (int32 i = 0; i < 1000000; ++i)
 	{
-		//1.재귀 락
-		//2.언락 실수 
-		//m.lock();
-		//m.lock(); //재귀적 잠금은 불가능, recLock 따로 있음
-
-		//LockGuard<mutex> lg(m);
-		lock_guard<mutex> lg(m);
-		vec.push_back(i);
-		//m.unlock();
+		//lock_guard<mutex> guard(m);
+		lock_guard<SpinLock> guard(spingLock);
+		sum++;
+	}
+}
+void Sub()
+{
+	for (int32 i = 0; i < 1000000; ++i)
+	{
+		//lock_guard<mutex> guard(m);
+		lock_guard<SpinLock> guard(spingLock);
+		sum--;
 	}
 }
 
 int main()
 {
-	thread t1(Push);
-	thread t2(Push);
+	thread t1(Add);
+	thread t2(Sub);
+
 	t1.join();
 	t2.join();
-	cout << vec.size() << endl;
 
+	cout << sum << endl;
 }
