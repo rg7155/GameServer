@@ -5,27 +5,35 @@
 //표준 라이브러리 사용
 //윈도우즈,리눅스 환경 등 호환
 #include <thread>
+#include <atomic>
 
-void HelloThread()
+atomic<int32> sum = 0;
+void Add()
 {
-	cout << "Hello CGH" << endl;
+	for (int32 i = 0; i < 1000000; ++i)
+	{
+		//디버그->창->디스어셈블리
+		//cpu에서 레지스터에 읽고, 연산하고, 쓰는 3가지 과정
+		//sum++;
+
+		sum.fetch_add(1); //atomic 인자임을 확인 가능
+	}
+}
+
+void Sub()
+{
+	for (int32 i = 0; i < 1000000; ++i)
+	{
+		sum.fetch_add(-1);
+	}
 }
 
 int main()
 {
-	//시스템 콜, 커널모드 요청이라 무겁다
-	//cout << "Hello CGH" << endl;
-	HelloThread();
+	thread t1(Add);
+	thread t2(Sub);
+	t1.join();
+	t2.join();
+	cout << sum << endl;
 
-	//독립적은 스레드 생성되며, 병렬 처리 된다.
-	thread t(HelloThread);
-
-	int32 count = t.hardware_concurrency(); //cpu 코어 개수, 100프로 정확은 아님
-	t.get_id(); //스레드 id
-	t.detach(); //실제 스레드와 분리한다. 이후엔 상태 확인 어려움. 딱히 안쓴다.
-	t.joinable(); //
-		
-
-	//메인스레드가 t의 종료를 기다린다.
-	t.join();
 }
