@@ -5,66 +5,57 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <windows.h>
 
 
-class SpinLock
+mutex m;
+queue<int32> q;
+HANDLE handle;
+
+void Producer()
 {
-public:
-	void lock()
+	while (true)
 	{
-		bool expected = false;
-		bool desired = true;
-
-		//실패하면 계속 시도해라
-		while (_locked.compare_exchange_strong(expected, desired) == false)
 		{
-			expected = false;
-
-			//이때 동안 대기상태로, 스케줄링 제외
-			//실패 했으면 커널로 돌아간다.
-			
-			//this_thread::sleep_for(chrono::microseconds(100));
-			this_thread::sleep_for(0ms);//operator ms 로 쓸 수 있음
-			//this_thread::yield();//sleep 0ms 와 같음
+			unique_lock<mutex> lock(m);
+			q.push(100);
+		}
+		::SetEvent(handle); //시그널 상태로 변환
+		this_thread::sleep_for(100ms);
+	}
+}
+void Consumer()
+{
+	//Producer의 sleep이 길어도 계속 확인을 해야하는 비효율적 상황
+	while (true)
+	{
+		::WaitForSingleObject(handle, INFINITE);
+		//수동 이벤트이므로 다시 NonSignal
+		//만약 자동 이벤트라면
+		//::ResetEvent(handle);
+		unique_lock<mutex> lock(m);
+		if(!q.empty())
+		{
+			cout << q.front() << endl;
+			q.pop();
 		}
 	}
-	void unlock()
-	{
-		_locked.store(false);//atomic 함수를 사용하여 변경
-	}
-private:
-	atomic<bool> _locked = false; //volatile 기능을 하고 있다.
-};
+}
 
-int32 sum = 0;
-mutex m;
-SpinLock spingLock;
-void Add()
-{
-	for (int32 i = 0; i < 1000000; ++i)
-	{
-		//lock_guard<mutex> guard(m);
-		lock_guard<SpinLock> guard(spingLock);
-		sum++;
-	}
-}
-void Sub()
-{
-	for (int32 i = 0; i < 1000000; ++i)
-	{
-		//lock_guard<mutex> guard(m);
-		lock_guard<SpinLock> guard(spingLock);
-		sum--;
-	}
-}
 
 int main()
 {
-	thread t1(Add);
-	thread t2(Sub);
+	//커널 오브젝트임, 반환값은 번호표 같은 것
+	// Usage Count
+	// Signal(파란불), Non Signal (빨간불)
+	// Auto(자동), Manual(수동)
+	//
+	handle = CreateEvent(NULL, FALSE/*자동 이벤트*/, FALSE, NULL);
+	thread t1(Producer);
+	thread t2(Consumer);
 
 	t1.join();
 	t2.join();
 
-	cout << sum << endl;
+	::CloseHandle(handle);
 }
