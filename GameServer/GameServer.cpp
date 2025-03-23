@@ -2,38 +2,54 @@
 #include <iostream>
 #include "CorePch.h"
 
-//표준 라이브러리 사용
-//윈도우즈,리눅스 환경 등 호환
 #include <thread>
 #include <atomic>
+#include <mutex>
 
-atomic<int32> sum = 0;
-void Add()
+vector<int32> vec;
+mutex m;
+
+template<typename T>
+class LockGuard
 {
-	for (int32 i = 0; i < 1000000; ++i)
+public:
+	LockGuard(T& m)
 	{
-		//디버그->창->디스어셈블리
-		//cpu에서 레지스터에 읽고, 연산하고, 쓰는 3가지 과정
-		//sum++;
-
-		sum.fetch_add(1); //atomic 인자임을 확인 가능
+		_mutex = &m;
+		_mutex->lock();
 	}
-}
-
-void Sub()
-{
-	for (int32 i = 0; i < 1000000; ++i)
+	~LockGuard()
 	{
-		sum.fetch_add(-1);
+		_mutex->unlock();
+	}
+private:
+	T* _mutex;
+};
+
+void Push()
+{
+	//stl은 멀티스레드 지원 안함
+	//1.벡터 재할당문제, 백테 삽입 위치 문제
+	for (int32 i = 0; i < 10000; ++i)
+	{
+		//1.재귀 락
+		//2.언락 실수 
+		//m.lock();
+		//m.lock(); //재귀적 잠금은 불가능, recLock 따로 있음
+
+		//LockGuard<mutex> lg(m);
+		lock_guard<mutex> lg(m);
+		vec.push_back(i);
+		//m.unlock();
 	}
 }
 
 int main()
 {
-	thread t1(Add);
-	thread t2(Sub);
+	thread t1(Push);
+	thread t2(Push);
 	t1.join();
 	t2.join();
-	cout << sum << endl;
+	cout << vec.size() << endl;
 
 }
