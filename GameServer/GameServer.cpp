@@ -6,69 +6,60 @@
 #include <atomic>
 #include <mutex>
 #include <windows.h>
+#include <future>
 
 
-mutex m;
-queue<int32> q;
-HANDLE handle;
-
-//유제 레벨 오브젝트이다.
-condition_variable cv;
-//#include <condition_variable>
-//condition_variable_any cva;
-
-void Producer()
+int64 Calculate()
 {
-	while (true)
-	{
-		// 락잡고
-		// 공유변수 수정
-		// 락 풀고
-		// 조건변수로 다른 스레드에게 통지
-		// 
-		//
-		{
-			unique_lock<mutex> lock(m);
-			q.push(100);
-		}
-		//::SetEvent(handle); //시그널 상태로 변환
-		//this_thread::sleep_for(100ms);
-		cv.notify_one(); //wait중인 딱 한 개의 스레드 깨운다
-	}
-}
-void Consumer()
-{
-	while (true)
-	{
-		//::WaitForSingleObject(handle, INFINITE);
-		//이 부분 오자마자 Producer한테 바로 넘어갈 수 있음
-	
-		unique_lock<mutex> lock(m);
-		cv.wait(lock, []() { return q.empty() == false; }); //큐 비어있지 않을 때 까지 기다림
-		// 락잡고
-		// 조건확인
-		//	만족하면 탈출 후 진행
-		//	만족 안 하면,락 풀고 대기
-	
-		//Spurious Wakeup(가짜 기상)
-		//notify_one은 lock 잡혀있는 게 아니기 때문에, 조건이 필요함
-		{
-			cout << q.front() << endl;
-			q.pop();
-		}
-	}
+	int64 sum = 0;
+	for(int32 i = 0; i < 100000; ++i)
+		sum += i;
+	return sum;
 }
 
+void PromiseWorker(promise<string>&& promise)
+{
+	promise.set_value("MSG");
+}
 
 int main()
 {
+	{
+		/*
+		* 1.deferred->lazy evaluation, 지연실행, 그냥 나중에 호출하는거
+		* 2.async->별도 스레드 생성 후 실행
+		* 3.deferred | async->
+		*/
+		future<int64> future = async(launch::async, Calculate);
 
-	handle = CreateEvent(NULL, FALSE/*자동 이벤트*/, FALSE, NULL);
-	thread t1(Producer);
-	thread t2(Consumer);
+		//1ms만 기다려보겠다, 상태 잠시 확인
+		//future_status status = future.wait_for(1ms);
+		//if (status == future_status::ready)
+		//{
 
-	t1.join();
-	t2.join();
+		//}
 
-	::CloseHandle(handle);
+		//계속 기다림, get 하는 거나 똑같음
+		future.wait();
+
+		int64 sum = future.get();
+
+
+		//객체멤버 함수
+		//Knight knight;
+		//future<int64> future2 = async(launch::async, &Knight::GetHp, knight); //knight.GetHp()
+
+	}
+
+	{
+		//미래에 결과물 반환해줄거라는 약속?
+		promise<string> promise;
+		future<string> future = promise.get_future();
+
+		//future는 메인스레드가 갖고, promise는 워커스레드가 갖는다
+		thread t(PromiseWorker, move(promise));
+		string msg = future.get();
+		cout << msg << endl;
+		t.join();
+	}
 }
