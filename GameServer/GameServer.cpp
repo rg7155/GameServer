@@ -8,47 +8,28 @@
 #include <windows.h>
 #include <future>
 
+thread_local int32 LThreadID = 0;
+//int32 LThreadID = 0;
 
-atomic<bool> flag;
-
-atomic<bool> ready;
-int32 value;
-void Producer()
+void th(int32 id)
 {
-	value = 10;
-	ready.store(true, memory_order::memory_order_release);
-	//atomic_thread_fence(memory_order::memory_order_release);
-	//=====================
-}
-void Consumer()
-{
-	//=====================
-	while (ready.load(memory_order::memory_order_acquire) == false)
-		;
-	cout << value;
+	LThreadID = id;
+	while (true)
+	{
+		cout << LThreadID << endl;
+		this_thread::sleep_for(1s);
+	}
 }
 
 int main()
 {
-	flag = false;
-	//flag.is_lock_free();
-	flag.store(true, memory_order::memory_order_seq_cst);
-	bool res = flag.load();
-
-	//이전 flag 값을 prev에 넣고 flag 값 수정할 때
+	vector<thread> threads;
+	for (int32 i = 0; i < 10; ++i)
 	{
-		//bool prev = flag;
-		//flag = true;
-
-		bool prev = flag.exchange(true);
+		threads.push_back(thread(th, i + 1));
 	}
 
-	{
-		/*
-		* 메모리 모델 정책
-		* 1.seq_cst (컴파일러 최적화 적음, )
-		* 2.acquire, release
-		* 3.relaxed
-		*/
-	}
+	for (int32 i = 0; i < 10; ++i)
+		threads[i].join();
+
 }
