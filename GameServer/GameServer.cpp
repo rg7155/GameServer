@@ -31,10 +31,9 @@ void Pop()
 {
 	while (true)
 	{
-		int32 data = 0;
-		//if (q.TryPop(OUT data)) //참조 타입을 알려주는 OUT
-		if (s.TryPop(OUT data)) 
-			cout << data << endl;
+		auto data = s.TryPop();
+		if (data)
+			cout << (*data) << endl;
 	}
 }
 
