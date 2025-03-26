@@ -8,47 +8,47 @@
 #include <windows.h>
 #include <future>
 
-int32 x;
-int32 y;
-int32 r1;
-int32 r2;
-volatile bool ready;
-void Thread1()
-{
-	while (!ready){}
-		
 
-	y = 1;
-	r1 = x;
+atomic<bool> flag;
+
+atomic<bool> ready;
+int32 value;
+void Producer()
+{
+	value = 10;
+	ready.store(true, memory_order::memory_order_release);
+	//atomic_thread_fence(memory_order::memory_order_release);
+	//=====================
 }
-void Thread2()
+void Consumer()
 {
-	while (!ready){}
-
-	x = 1;
-	r2 = y;
+	//=====================
+	while (ready.load(memory_order::memory_order_acquire) == false)
+		;
+	cout << value;
 }
 
 int main()
 {
-	int32 count = 0;
-	while (true)
+	flag = false;
+	//flag.is_lock_free();
+	flag.store(true, memory_order::memory_order_seq_cst);
+	bool res = flag.load();
+
+	//이전 flag 값을 prev에 넣고 flag 값 수정할 때
 	{
-		ready = false;
-		++count;
+		//bool prev = flag;
+		//flag = true;
 
-		x = y = r1 = r2 = 0;
-
-		thread t1(Thread1);
-		thread t2(Thread1);
-
-		ready = true;
-
-		t1.join();
-		t2.join();
-
-		if (r1 == 0 && r2 == 0)
-			break;
+		bool prev = flag.exchange(true);
 	}
-	cout << count << endl;
+
+	{
+		/*
+		* 메모리 모델 정책
+		* 1.seq_cst (컴파일러 최적화 적음, )
+		* 2.acquire, release
+		* 3.relaxed
+		*/
+	}
 }
