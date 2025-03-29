@@ -7,53 +7,81 @@
 #include <future>
 #include "ThreadManager.h"
 
-#include <vector>
-#include <thread>
+#include "RefCounting.h"
 
-atomic<int> primeCount = 0;
-bool isPrime(int number)
+class Wraight : public RefCountable
 {
-	if (number <= 1)
+public:
+	int _hp = 150;
+	int _posX = 0;
+	int _posY = 0;
+};
+
+using WraightRef = TSharedPtr<Wraight>;
+
+class Missile : public RefCountable
+{
+public:
+	void SetTarget(WraightRef target)
+	{
+		_target = target;
+		// 중간에 개입 가능
+		//target->AddRef();
+	}
+
+	bool Update()
+	{
+		if (_target == nullptr)
+			return true;
+
+		int posX = _target->_posX;
+		int posY = _target->_posY;
+
+		// TODO : 쫓아간다
+
+		if (_target->_hp == 0)
+		{
+			//_target->ReleaseRef();
+			_target = nullptr;
+			return true;
+		}
+
 		return false;
-	if (number <= 3)
-		return true;
+	}
 
-	for (int i = 2; i * i <= number; ++i)
-	{
-		if ((number % i) == 0)
-			return false;
-	}
-	return true;
-}
-void countPrime(int start, int end)
-{
-	for (int i = start; i <= end; ++i)
-	{
-		if (isPrime(i))
-			primeCount.fetch_add(1);
-	}
-}
+	WraightRef _target = nullptr;
+};
+
+using MissileRef = TSharedPtr<Missile>;
 
 int main()
 {
-	const int MAX_NUM = 100'0000;
-	int coreCount = thread::hardware_concurrency();
-	int jobCount = MAX_NUM / coreCount;
-	vector<thread> threads;
-	for (int i = 0; i < coreCount; ++i)
+	WraightRef wraight(new Wraight());
+	wraight->ReleaseRef();
+	MissileRef missile(new Missile());
+	missile->ReleaseRef();
+
+	missile->SetTarget(wraight);
+
+	// 레이스가 피격 당함
+	wraight->_hp = 0;
+	//delete wraight;
+	//wraight->ReleaseRef();
+	wraight = nullptr;
+
+	while (true)
 	{
-		int start = i * jobCount;
-		int end = (i + 1) * jobCount;
-
-		thread t = thread(countPrime, start, end);
-		threads.push_back(move(t)); //thread 복사생성자 금지
-
-		//threads.push_back(thread(countPrime, start, end));
-	}
-	for (int i = 0; i < threads.size(); ++i)
-	{
-		threads[i].join();
+		if (missile)
+		{
+			if (missile->Update())
+			{
+				//missile->ReleaseRef();
+				missile = nullptr;
+			}
+		}
 	}
 
-	cout << primeCount;
+	//missile->ReleaseRef();
+	missile = nullptr;
+	//delete missile;
 }
