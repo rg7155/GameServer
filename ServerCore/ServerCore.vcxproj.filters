@@ -48,6 +48,8 @@
     <ClInclude Include="RefCounting.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Allocator.h" />
+    <ClInclude Include="Memory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CoreGlobal.cpp">
@@ -74,5 +76,7 @@
     <ClCompile Include="RefCounting.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Allocator.cpp" />
+    <ClCompile Include="Memory.cpp" />
   </ItemGroup>
 </Project>
