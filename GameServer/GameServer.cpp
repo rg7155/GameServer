@@ -11,49 +11,47 @@
 #include "Memory.h"
 #include "Allocator.h"
 
-class Player
+class Knight
 {
 public:
-	Player() {}
-	virtual ~Player() {}
+	int32 _hp = rand() % 1000;
 };
 
-class Knight : public Player
+class Monster
 {
 public:
-	Knight()
-	{
-		cout << "Knight()" << endl;
-	}
-
-	Knight(int32 hp) : _hp(hp)
-	{
-		cout << "Knight(hp)" << endl;
-	}
-
-	~Knight()
-	{
-		cout << "~Knight()" << endl;
-	}
-
-	int32 _hp = 100;
-	int32 _mp = 10;
+	int64 _id = 0;
 };
 
 int main()
 {
+	Knight* knights[100];
+
+	for (int32 i = 0; i < 100; i++)
+		knights[i] = ObjectPool<Knight>::Pop();
+
+	for (int32 i = 0; i < 100; i++)
+	{
+		ObjectPool<Knight>::Push(knights[i]);
+		knights[i] = nullptr;
+	}
+
+	shared_ptr<Knight> sptr = ObjectPool<Knight>::MakeShared();
+	shared_ptr<Knight> sptr2 = MakeShared<Knight>();
+
 	for (int32 i = 0; i < 5; i++)
 	{
 		GThreadManager->Launch([]()
 		{
 			while (true)
 			{
-				Vector<Knight> v(10);
+				Knight* knight = xnew<Knight>();
 
-				Map<int32, Knight> m;
-				m[100] = Knight();
+				cout << knight->_hp << endl;
 
 				this_thread::sleep_for(10ms);
+
+				xdelete(knight);
 			}
 		});
 	}
