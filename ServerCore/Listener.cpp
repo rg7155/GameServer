@@ -29,17 +29,7 @@ bool Listener::StartAccept(ServerServiceRef service)
 
 	_socket = SocketUtils::CreateSocket();
 	if (_socket == INVALID_SOCKET)
-	{
-		int32 errCode = ::WSAGetLastError();
-		switch (errCode)
-		{
-		case WAIT_TIMEOUT:
-			return false;
-		default:
-			break;
-		}
 		return false;
-	}
 
 	if (_service->GetIocpCore()->Register(shared_from_this()) == false)
 		return false;
@@ -123,10 +113,6 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 	}
 
 	session->SetNetAddress(NetAddress(sockAddress));
-
-	cout << "Client Connected!" << endl;
-
-	// TODO
-
+	session->ProcessConnect();
 	RegisterAccept(acceptEvent);
 }
