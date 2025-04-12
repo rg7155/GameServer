@@ -21,6 +21,8 @@
     <ClCompile Include="ConcurrentQueue.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="GameSession.cpp" />
+    <ClCompile Include="GameSessionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -32,5 +34,7 @@
     <ClInclude Include="ConcurrentQueue.h">
       <Filter>Main</Filter>
     </ClInclude>
+    <ClInclude Include="GameSession.h" />
+    <ClInclude Include="GameSessionManager.h" />
   </ItemGroup>
 </Project>
