@@ -5,8 +5,8 @@
 #include "BufferReader.h"
 #include "ServerPacketHandler.h"
 
-char sendData[] = "Hello World";
-
+//빌드 전 이벤트 
+//CALL $(SolutionDir)Common\Protobuf\bin\GenPackets.bat
 class ServerSession : public PacketSession
 {
 public:
@@ -17,6 +17,7 @@ public:
 
 	virtual void OnConnected() override
 	{
+		cout << " Server Connected" << endl;
 		Protocol::C_LOGIN pkt;
 		auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 		Send(sendBuffer);
@@ -42,19 +43,63 @@ public:
 	}
 };
 
+//TODO
+class Player
+{
+public:
+
+	//uint64					playerId = 0;
+	//string					name;
+	//Protocol::PlayerType	type = Protocol::PLAYER_TYPE_NONE;
+	Protocol::ChatType		chatType = Protocol::CHAT_TYPE_NONE;
+	uint32					channelNum = 0;
+
+};
+
+
+shared_ptr<class Player> GPlayer;
+ClientServiceRef GService;
+
+void CheckCommand(const string& str)
+{
+	string command = str.substr(1);
+	if (command.find("all") != string::npos)
+	{
+		GPlayer->chatType = Protocol::CHAT_TYPE_ALL;
+		cout << "Change All Mode" << endl;
+	}
+	else if (command.find("ch") != string::npos)
+	{
+		GPlayer->chatType = Protocol::CHAT_TYPE_CHANNEL;
+		GPlayer->channelNum = str.back() - '0';
+		cout << "Change Ch" << GPlayer->channelNum << " Mode" << endl;
+	}
+}
+void CheckChat(const string& str)
+{
+	Protocol::C_CHAT chatPkt;
+	chatPkt.set_msg(str);
+	chatPkt.set_chattype(GPlayer->chatType);
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(chatPkt);
+	GService->Broadcast(sendBuffer);
+}
+
 int main()
 {
 	ServerPacketHandler::Init();
+	GPlayer = MakeShared<Player>();
+	GPlayer->chatType = Protocol::CHAT_TYPE_ALL;
 
 	this_thread::sleep_for(1s);
 
-	ClientServiceRef service = MakeShared<ClientService>(
+	GService = MakeShared<ClientService>(
 		NetAddress(L"127.0.0.1", 7777),
 		MakeShared<IocpCore>(),
-		MakeShared<ServerSession>, // TODO : SessionManager 등
-		100);
+		MakeShared<ServerSession>, 
+		1);
 
-	ASSERT_CRASH(service->Start());
+	ASSERT_CRASH(GService->Start());
 
 	for (int32 i = 0; i < 2; i++)
 	{
@@ -62,20 +107,29 @@ int main()
 		{
 			while (true)
 			{
-				service->GetIocpCore()->Dispatch();
+				GService->GetIocpCore()->Dispatch();
 			}
 		});
 	}
 
-	Protocol::C_CHAT chatPkt;
-	chatPkt.set_msg(u8"Hello World !");
-	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(chatPkt);
+	//TODO connected 이후
+	this_thread::sleep_for(1s);
 
 	while (true)
 	{
-		service->Broadcast(sendBuffer);
-		this_thread::sleep_for(1s);
+		string str = "";
+		//cout << ">>";
+		cin >> str;
+		if (str[0] == '/')
+		{
+			CheckCommand(str);
+		}
+		else
+		{
+			CheckChat(str);
+		}
 	}
 
 	GThreadManager->Join();
 }
+

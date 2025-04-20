@@ -32,7 +32,7 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 
 	{
 		auto player = loginPkt.add_players();
-		player->set_name(u8"DB에서긁어온이름1");
+		player->set_name(u8"Test1");
 		player->set_playertype(Protocol::PLAYER_TYPE_KNIGHT);
 
 		PlayerRef playerRef = MakeShared<Player>();
@@ -44,19 +44,19 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 		gameSession->_players.push_back(playerRef);
 	}
 
-	{
-		auto player = loginPkt.add_players();
-		player->set_name(u8"DB에서긁어온이름2");
-		player->set_playertype(Protocol::PLAYER_TYPE_MAGE);
+	//{
+	//	auto player = loginPkt.add_players();
+	//	player->set_name(u8"DB에서긁어온이름2");
+	//	player->set_playertype(Protocol::PLAYER_TYPE_MAGE);
 
-		PlayerRef playerRef = MakeShared<Player>();
-		playerRef->playerId = idGenerator++;
-		playerRef->name = player->name();
-		playerRef->type = player->playertype();
-		playerRef->ownerSession = gameSession;
+	//	PlayerRef playerRef = MakeShared<Player>();
+	//	playerRef->playerId = idGenerator++;
+	//	playerRef->name = player->name();
+	//	playerRef->type = player->playertype();
+	//	playerRef->ownerSession = gameSession;
 
-		gameSession->_players.push_back(playerRef);
-	}
+	//	gameSession->_players.push_back(playerRef);
+	//}
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(loginPkt);
 	session->Send(sendBuffer);
@@ -88,9 +88,17 @@ bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 
 	Protocol::S_CHAT chatPkt;
 	chatPkt.set_msg(pkt.msg());
+	chatPkt.set_chattype(pkt.chattype());
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(chatPkt);
 
-	GRoom.Broadcast(sendBuffer); // WRITE_LOCK
+	switch (pkt.chattype())
+	{
+	case Protocol::CHAT_TYPE_ALL:
+		GRoom.Broadcast(sendBuffer); // WRITE_LOCK
+		break;
+	default:
+		break;
+	}
 
 	return true;
 }

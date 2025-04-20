@@ -34,11 +34,25 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 {
 	// TODO
+	cout << " Enter Game!!" << endl;
 	return true;
 }
 
 bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt)
 {
-	std::cout << pkt.msg() << endl;
+	string chatType = "";
+	switch (pkt.chattype())
+	{
+	case Protocol::CHAT_TYPE_ALL:
+		chatType = "All";
+		break;
+	case Protocol::CHAT_TYPE_CHANNEL:
+		chatType = "Ch" + pkt.channel();
+		break;
+	default:
+		break;
+	}
+	std::cout << "[" << chatType << "/" << "Name" << "]" << pkt.msg() << endl;
 	return true;
 }
+

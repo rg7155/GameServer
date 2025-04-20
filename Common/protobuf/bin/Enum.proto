@@ -8,3 +8,11 @@ enum PlayerType
 	PLAYER_TYPE_MAGE = 2;
 	PLAYER_TYPE_ARCHER = 3;
 }
+
+enum ChatType
+{
+	CHAT_TYPE_NONE = 0;
+	CHAT_TYPE_ALL = 1;
+	CHAT_TYPE_CHANNEL = 2;
+	CHAT_TYPE_WHISPER = 3;
+}

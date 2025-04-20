@@ -731,6 +731,8 @@ class C_CHAT final :
 
   enum : int {
     kMsgFieldNumber = 1,
+    kChannelFieldNumber = 3,
+    kChatTypeFieldNumber = 2,
   };
   // string msg = 1;
   void clear_msg();
@@ -746,6 +748,24 @@ class C_CHAT final :
   std::string* _internal_mutable_msg();
   public:
 
+  // uint64 channel = 3;
+  void clear_channel();
+  ::PROTOBUF_NAMESPACE_ID::uint64 channel() const;
+  void set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::uint64 _internal_channel() const;
+  void _internal_set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value);
+  public:
+
+  // .Protocol.ChatType chatType = 2;
+  void clear_chattype();
+  ::Protocol::ChatType chattype() const;
+  void set_chattype(::Protocol::ChatType value);
+  private:
+  ::Protocol::ChatType _internal_chattype() const;
+  void _internal_set_chattype(::Protocol::ChatType value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.C_CHAT)
  private:
   class _Internal;
@@ -754,6 +774,8 @@ class C_CHAT final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
+  ::PROTOBUF_NAMESPACE_ID::uint64 channel_;
+  int chattype_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Protocol_2eproto;
 };
@@ -867,10 +889,11 @@ class S_CHAT final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kMsgFieldNumber = 2,
-    kPlayerIdFieldNumber = 1,
+    kMsgFieldNumber = 1,
+    kChannelFieldNumber = 3,
+    kChatTypeFieldNumber = 2,
   };
-  // string msg = 2;
+  // string msg = 1;
   void clear_msg();
   const std::string& msg() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -884,13 +907,22 @@ class S_CHAT final :
   std::string* _internal_mutable_msg();
   public:
 
-  // uint64 playerId = 1;
-  void clear_playerid();
-  ::PROTOBUF_NAMESPACE_ID::uint64 playerid() const;
-  void set_playerid(::PROTOBUF_NAMESPACE_ID::uint64 value);
+  // uint64 channel = 3;
+  void clear_channel();
+  ::PROTOBUF_NAMESPACE_ID::uint64 channel() const;
+  void set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::uint64 _internal_playerid() const;
-  void _internal_set_playerid(::PROTOBUF_NAMESPACE_ID::uint64 value);
+  ::PROTOBUF_NAMESPACE_ID::uint64 _internal_channel() const;
+  void _internal_set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value);
+  public:
+
+  // .Protocol.ChatType chatType = 2;
+  void clear_chattype();
+  ::Protocol::ChatType chattype() const;
+  void set_chattype(::Protocol::ChatType value);
+  private:
+  ::Protocol::ChatType _internal_chattype() const;
+  void _internal_set_chattype(::Protocol::ChatType value);
   public:
 
   // @@protoc_insertion_point(class_scope:Protocol.S_CHAT)
@@ -901,7 +933,8 @@ class S_CHAT final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
-  ::PROTOBUF_NAMESPACE_ID::uint64 playerid_;
+  ::PROTOBUF_NAMESPACE_ID::uint64 channel_;
+  int chattype_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Protocol_2eproto;
 };
@@ -1073,31 +1106,51 @@ inline void C_CHAT::set_allocated_msg(std::string* msg) {
   // @@protoc_insertion_point(field_set_allocated:Protocol.C_CHAT.msg)
 }
 
+// .Protocol.ChatType chatType = 2;
+inline void C_CHAT::clear_chattype() {
+  chattype_ = 0;
+}
+inline ::Protocol::ChatType C_CHAT::_internal_chattype() const {
+  return static_cast< ::Protocol::ChatType >(chattype_);
+}
+inline ::Protocol::ChatType C_CHAT::chattype() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_CHAT.chatType)
+  return _internal_chattype();
+}
+inline void C_CHAT::_internal_set_chattype(::Protocol::ChatType value) {
+  
+  chattype_ = value;
+}
+inline void C_CHAT::set_chattype(::Protocol::ChatType value) {
+  _internal_set_chattype(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_CHAT.chatType)
+}
+
+// uint64 channel = 3;
+inline void C_CHAT::clear_channel() {
+  channel_ = uint64_t{0u};
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint64 C_CHAT::_internal_channel() const {
+  return channel_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint64 C_CHAT::channel() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_CHAT.channel)
+  return _internal_channel();
+}
+inline void C_CHAT::_internal_set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value) {
+  
+  channel_ = value;
+}
+inline void C_CHAT::set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value) {
+  _internal_set_channel(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_CHAT.channel)
+}
+
 // -------------------------------------------------------------------
 
 // S_CHAT
 
-// uint64 playerId = 1;
-inline void S_CHAT::clear_playerid() {
-  playerid_ = uint64_t{0u};
-}
-inline ::PROTOBUF_NAMESPACE_ID::uint64 S_CHAT::_internal_playerid() const {
-  return playerid_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::uint64 S_CHAT::playerid() const {
-  // @@protoc_insertion_point(field_get:Protocol.S_CHAT.playerId)
-  return _internal_playerid();
-}
-inline void S_CHAT::_internal_set_playerid(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  
-  playerid_ = value;
-}
-inline void S_CHAT::set_playerid(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  _internal_set_playerid(value);
-  // @@protoc_insertion_point(field_set:Protocol.S_CHAT.playerId)
-}
-
-// string msg = 2;
+// string msg = 1;
 inline void S_CHAT::clear_msg() {
   msg_.ClearToEmpty();
 }
@@ -1140,6 +1193,46 @@ inline void S_CHAT::set_allocated_msg(std::string* msg) {
   msg_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), msg,
       GetArenaForAllocation());
   // @@protoc_insertion_point(field_set_allocated:Protocol.S_CHAT.msg)
+}
+
+// .Protocol.ChatType chatType = 2;
+inline void S_CHAT::clear_chattype() {
+  chattype_ = 0;
+}
+inline ::Protocol::ChatType S_CHAT::_internal_chattype() const {
+  return static_cast< ::Protocol::ChatType >(chattype_);
+}
+inline ::Protocol::ChatType S_CHAT::chattype() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_CHAT.chatType)
+  return _internal_chattype();
+}
+inline void S_CHAT::_internal_set_chattype(::Protocol::ChatType value) {
+  
+  chattype_ = value;
+}
+inline void S_CHAT::set_chattype(::Protocol::ChatType value) {
+  _internal_set_chattype(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_CHAT.chatType)
+}
+
+// uint64 channel = 3;
+inline void S_CHAT::clear_channel() {
+  channel_ = uint64_t{0u};
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint64 S_CHAT::_internal_channel() const {
+  return channel_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint64 S_CHAT::channel() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_CHAT.channel)
+  return _internal_channel();
+}
+inline void S_CHAT::_internal_set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value) {
+  
+  channel_ = value;
+}
+inline void S_CHAT::set_channel(::PROTOBUF_NAMESPACE_ID::uint64 value) {
+  _internal_set_channel(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_CHAT.channel)
 }
 
 #ifdef __GNUC__

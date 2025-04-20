@@ -17,6 +17,7 @@ message S_LOGIN
 
 message C_ENTER_GAME
 {
+	//
 	uint64 playerIndex = 1;
 }
 
@@ -28,10 +29,13 @@ message S_ENTER_GAME
 message C_CHAT
 {
 	string msg = 1;
+	ChatType chatType = 2;
+	uint64 channel = 3;
 }
 
 message S_CHAT
 {
-	uint64 playerId = 1;
-	string msg = 2;
+	string msg = 1;
+	ChatType chatType = 2;
+	uint64 channel = 3;
 }
