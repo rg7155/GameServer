@@ -168,17 +168,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Enum.pb.cc" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Protocol.pb.cc" />
     <ClCompile Include="ServerPacketHandler.cpp" />
     <ClCompile Include="DummyClient.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="ServerSession.cpp" />
     <ClCompile Include="Struct.pb.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enum.pb.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Protocol.pb.h" />
     <ClInclude Include="ServerPacketHandler.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ServerSession.h" />
     <ClInclude Include="Struct.pb.h" />
   </ItemGroup>
   <ItemGroup>

@@ -4,60 +4,17 @@
 #include "Session.h"
 #include "BufferReader.h"
 #include "ServerPacketHandler.h"
+#include "ServerSession.h"
+#include "Player.h"
 
 //빌드 전 이벤트 
 //CALL $(SolutionDir)Common\Protobuf\bin\GenPackets.bat
-class ServerSession : public PacketSession
-{
-public:
-	~ServerSession()
-	{
-		cout << "~ServerSession" << endl;
-	}
 
-	virtual void OnConnected() override
-	{
-		cout << " Server Connected" << endl;
-		Protocol::C_LOGIN pkt;
-		auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
-		Send(sendBuffer);
-	}
-
-	virtual void OnRecvPacket(BYTE* buffer, int32 len) override
-	{
-		PacketSessionRef session = GetPacketSessionRef();
-		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
-
-		// TODO : packetId 대역 체크
-		ServerPacketHandler::HandlePacket(session, buffer, len);
-	}
-
-	virtual void OnSend(int32 len) override
-	{
-		//cout << "OnSend Len = " << len << endl;
-	}
-
-	virtual void OnDisconnected() override
-	{
-		//cout << "Disconnected" << endl;
-	}
-};
 
 //TODO
-class Player
-{
-public:
-
-	//uint64					playerId = 0;
-	//string					name;
-	//Protocol::PlayerType	type = Protocol::PLAYER_TYPE_NONE;
-	Protocol::ChatType		chatType = Protocol::CHAT_TYPE_NONE;
-	uint32					channelNum = 0;
-
-};
 
 
-shared_ptr<class Player> GPlayer;
+PlayerRef GPlayer;
 ClientServiceRef GService;
 
 void CheckCommand(const string& str)

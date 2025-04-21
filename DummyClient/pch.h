@@ -11,3 +11,7 @@
 #endif
 
 #include "CorePch.h"
+
+using PlayerRef = shared_ptr<class Player>;
+using ServerSessionRef = shared_ptr<class ServerSession>;
+

@@ -31,32 +31,18 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	static Atomic<uint64> idGenerator = 1;
 
 	{
-		auto player = loginPkt.add_players();
-		player->set_name(u8"Test1");
-		player->set_playertype(Protocol::PLAYER_TYPE_KNIGHT);
+		auto player = loginPkt.mutable_player();
+		player->set_id(idGenerator);
+		player->set_name(pkt.name());
 
 		PlayerRef playerRef = MakeShared<Player>();
 		playerRef->playerId = idGenerator++;
-		playerRef->name = player->name();
-		playerRef->type = player->playertype();
+		playerRef->name = pkt.name();
 		playerRef->ownerSession = gameSession;
 
 		gameSession->_players.push_back(playerRef);
 	}
 
-	//{
-	//	auto player = loginPkt.add_players();
-	//	player->set_name(u8"DB에서긁어온이름2");
-	//	player->set_playertype(Protocol::PLAYER_TYPE_MAGE);
-
-	//	PlayerRef playerRef = MakeShared<Player>();
-	//	playerRef->playerId = idGenerator++;
-	//	playerRef->name = player->name();
-	//	playerRef->type = player->playertype();
-	//	playerRef->ownerSession = gameSession;
-
-	//	gameSession->_players.push_back(playerRef);
-	//}
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(loginPkt);
 	session->Send(sendBuffer);
@@ -64,23 +50,23 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	return true;
 }
 
-bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
-{
-	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
-
-	uint64 index = pkt.playerindex();
-	// TODO : Validation
-
-	PlayerRef player = gameSession->_players[index]; // READ_ONLY?
-	GRoom.Enter(player); // WRITE_LOCK
-
-	Protocol::S_ENTER_GAME enterGamePkt;
-	enterGamePkt.set_success(true);
-	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
-	player->ownerSession->Send(sendBuffer);
-
-	return true;
-}
+//bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
+//{
+//	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+//
+//	uint64 index = pkt.playerindex();
+//	// TODO : Validation
+//
+//	PlayerRef player = gameSession->_players[index]; // READ_ONLY?
+//	GRoom.Enter(player); // WRITE_LOCK
+//
+//	Protocol::S_ENTER_GAME enterGamePkt;
+//	enterGamePkt.set_success(true);
+//	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
+//	player->ownerSession->Send(sendBuffer);
+//
+//	return true;
+//}
 
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
