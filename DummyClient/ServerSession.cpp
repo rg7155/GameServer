@@ -5,7 +5,13 @@
 void ServerSession::OnConnected()
 {
 	cout << " Server Connected" << endl;
+	cout << "What's your name? >>";
+
 	Protocol::C_LOGIN pkt;
+	string name;
+	cin >> name;
+	pkt.set_name(name);
+
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	Send(sendBuffer);
 }

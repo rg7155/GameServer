@@ -16,6 +16,16 @@ message S_LOGIN
 }
 
 
+message C_COMMAND
+{
+	string msg = 1;
+}
+message S_COMMAND
+{
+	ChatType chatType = 1;
+	uint64 channel = 2;
+}
+
 message C_CHAT
 {
 	string msg = 1;

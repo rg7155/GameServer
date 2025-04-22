@@ -40,7 +40,8 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 		playerRef->name = pkt.name();
 		playerRef->ownerSession = gameSession;
 
-		gameSession->_players.push_back(playerRef);
+		gameSession->AddPlayer(playerRef);
+		GRoom.Enter(playerRef); 
 	}
 
 
@@ -50,27 +51,46 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	return true;
 }
 
-//bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
-//{
-//	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
-//
-//	uint64 index = pkt.playerindex();
-//	// TODO : Validation
-//
-//	PlayerRef player = gameSession->_players[index]; // READ_ONLY?
-//	GRoom.Enter(player); // WRITE_LOCK
-//
-//	Protocol::S_ENTER_GAME enterGamePkt;
-//	enterGamePkt.set_success(true);
-//	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(enterGamePkt);
-//	player->ownerSession->Send(sendBuffer);
-//
-//	return true;
-//}
+bool Handle_C_COMMAND(PacketSessionRef& session, Protocol::C_COMMAND& pkt)
+{
+	std::cout << "Command" << pkt.msg() << endl;
+
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->GetPlayer();
+
+	string str = pkt.msg();
+	string command = str.substr(1);
+
+	Protocol::S_COMMAND commandPkt;
+	if (command.find("all") != string::npos)
+	{
+		player->chatType = Protocol::CHAT_TYPE_ALL;
+		//commandPkt.set_chatType(Protocol::CHAT_TYPE_ALL);
+	}
+	else if (command.find("ch") != string::npos)
+	{
+		player->chatType = Protocol::CHAT_TYPE_CHANNEL;
+		player->channelNum = str.back() - '0';
+		//commandPkt.set_chatType(Protocol::CHAT_TYPE_CHANNEL);
+		commandPkt.set_channel(str.back() - '0');
+	}
+	else
+	{
+		cout << "Bad Command" << endl;
+		return false;
+	}
+
+	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(commandPkt);
+
+	return true;
+}
+
 
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
 	std::cout << pkt.msg() << endl;
+
+	string str = pkt.msg();
 
 	Protocol::S_CHAT chatPkt;
 	chatPkt.set_msg(pkt.msg());
@@ -82,9 +102,15 @@ bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 	case Protocol::CHAT_TYPE_ALL:
 		GRoom.Broadcast(sendBuffer); // WRITE_LOCK
 		break;
+	case Protocol::CHAT_TYPE_CHANNEL:
+		GRoom.BroadcastChannel(sendBuffer, pkt.channel());
+		break;
 	default:
+		cout << "Channel Type is None" << endl;
+		GRoom.Broadcast(sendBuffer);
 		break;
 	}
+
 
 	return true;
 }

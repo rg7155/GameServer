@@ -25,3 +25,13 @@ void Room::Broadcast(SendBufferRef sendBuffer)
 		p.second->ownerSession->Send(sendBuffer);
 	}
 }
+
+void Room::BroadcastChannel(SendBufferRef sendBuffer, uint64 channel)
+{
+	WRITE_LOCK;
+	for (auto& p : _players)
+	{
+		if(p.second->channelNum == channel)
+			p.second->ownerSession->Send(sendBuffer);
+	}
+}

@@ -19,11 +19,6 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	if (pkt.success() == false)
 		return true;
 
-	//if (pkt.players().size() == 0)
-	//{
-	//	// 캐릭터 생성창
-	//}
-
 	ServerSessionRef serverSession = static_pointer_cast<ServerSession>(session);
 	{
 		PlayerRef playerRef = MakeShared<Player>();
@@ -35,6 +30,12 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 		serverSession->_players.push_back(playerRef);
 	}
 	return true;
+}
+
+bool Handle_S_COMMAND(PacketSessionRef& session, Protocol::S_COMMAND& pkt)
+{
+	//TODO 채널 타입,채널 셋팅
+	return false;
 }
 
 

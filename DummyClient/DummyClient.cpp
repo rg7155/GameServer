@@ -11,32 +11,36 @@
 //CALL $(SolutionDir)Common\Protobuf\bin\GenPackets.bat
 
 
-//TODO
-
 
 PlayerRef GPlayer;
 ClientServiceRef GService;
 
 void CheckCommand(const string& str)
 {
-	string command = str.substr(1);
-	if (command.find("all") != string::npos)
-	{
-		GPlayer->chatType = Protocol::CHAT_TYPE_ALL;
-		cout << "Change All Mode" << endl;
-	}
-	else if (command.find("ch") != string::npos)
-	{
-		GPlayer->chatType = Protocol::CHAT_TYPE_CHANNEL;
-		GPlayer->channelNum = str.back() - '0';
-		cout << "Change Ch" << GPlayer->channelNum << " Mode" << endl;
-	}
+	Protocol::C_COMMAND commandPkt;
+	commandPkt.set_msg(str);
+
+	//string command = str.substr(1);
+	//if (command.find("all") != string::npos)
+	//{
+	//	commandPkt.set_chattype(Protocol::CHAT_TYPE_ALL);
+	//	//cout << "Change All Mode" << endl;
+	//}
+	//else if (command.find("ch") != string::npos)
+	//{
+	//	commandPkt.set_chattype(Protocol::CHAT_TYPE_CHANNEL);
+	//	commandPkt.set_channel(str.back() - '0');
+	//	//cout << "Change Ch" << GPlayer->channelNum << " Mode" << endl;
+	//}
+
+	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(commandPkt);
+	GService->Broadcast(sendBuffer);
 }
 void CheckChat(const string& str)
 {
 	Protocol::C_CHAT chatPkt;
 	chatPkt.set_msg(str);
-	chatPkt.set_chattype(GPlayer->chatType);
+	//chatPkt.set_chattype(GPlayer->chatType);
 
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(chatPkt);
 	GService->Broadcast(sendBuffer);

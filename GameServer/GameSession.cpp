@@ -2,6 +2,7 @@
 #include "GameSession.h"
 #include "GameSessionManager.h"
 #include "ClientPacketHandler.h"
+#include "Player.h"
 
 void GameSession::OnConnected()
 {
@@ -24,4 +25,21 @@ void GameSession::OnRecvPacket(BYTE* buffer, int32 len)
 
 void GameSession::OnSend(int32 len)
 {
+}
+
+void GameSession::AddPlayer(PlayerRef player)
+{
+	//_players.push_back(player);
+	_player = player;
+}
+
+PlayerRef GameSession::GetPlayer()
+{
+	return _player;
+	/*for (auto& p : _players)
+	{
+		if (p->playerId == playerId)
+			return p;
+	}
+	return nullptr;*/
 }
