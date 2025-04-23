@@ -53,26 +53,25 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 
 bool Handle_C_COMMAND(PacketSessionRef& session, Protocol::C_COMMAND& pkt)
 {
-	std::cout << "Command" << pkt.msg() << endl;
+	//std::cout << "Command : " << pkt.msg() << endl;
 
-	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
-	PlayerRef player = gameSession->GetPlayer();
+	//GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	//PlayerRef player = gameSession->GetPlayer();
 
-	string str = pkt.msg();
-	string command = str.substr(1);
+	auto player = pkt.player();
 
 	Protocol::S_COMMAND commandPkt;
-	if (command.find("all") != string::npos)
+	if (player.chattype() == Protocol::CHAT_TYPE_ALL)
 	{
-		player->chatType = Protocol::CHAT_TYPE_ALL;
-		//commandPkt.set_chatType(Protocol::CHAT_TYPE_ALL);
+		//player->chatType = Protocol::CHAT_TYPE_ALL;
+		player.set_chattype(Protocol::CHAT_TYPE_ALL);
 	}
-	else if (command.find("ch") != string::npos)
+	else if (player.chattype() == Protocol::CHAT_TYPE_CHANNEL)
 	{
-		player->chatType = Protocol::CHAT_TYPE_CHANNEL;
-		player->channelNum = str.back() - '0';
-		//commandPkt.set_chatType(Protocol::CHAT_TYPE_CHANNEL);
-		commandPkt.set_channel(str.back() - '0');
+		//player->chatType = Protocol::CHAT_TYPE_CHANNEL;
+		//player->channelNum = player.channel();
+		player.set_chattype(Protocol::CHAT_TYPE_CHANNEL);
+		player.set_channel(player.channel());
 	}
 	else
 	{
@@ -81,7 +80,7 @@ bool Handle_C_COMMAND(PacketSessionRef& session, Protocol::C_COMMAND& pkt)
 	}
 
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(commandPkt);
-
+	session->Send(sendBuffer);
 	return true;
 }
 
@@ -92,24 +91,29 @@ bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 
 	string str = pkt.msg();
 
+	//GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	//PlayerRef player = gameSession->GetPlayer();
+	auto player = pkt.player();
+
 	Protocol::S_CHAT chatPkt;
 	chatPkt.set_msg(pkt.msg());
-	chatPkt.set_chattype(pkt.chattype());
+	chatPkt.mutable_player()->CopyFrom(pkt.player()); //  protobuf 메시지끼리의 deep copy 함수
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(chatPkt);
 
-	switch (pkt.chattype())
+	switch (player.chattype())
 	{
 	case Protocol::CHAT_TYPE_ALL:
 		GRoom.Broadcast(sendBuffer); // WRITE_LOCK
 		break;
 	case Protocol::CHAT_TYPE_CHANNEL:
-		GRoom.BroadcastChannel(sendBuffer, pkt.channel());
+		GRoom.BroadcastChannel(sendBuffer, player.channel());
 		break;
 	default:
 		cout << "Channel Type is None" << endl;
 		GRoom.Broadcast(sendBuffer);
 		break;
 	}
+	//std::cout << "Recv " << chatType << "/" << player.name() << endl;
 
 
 	return true;

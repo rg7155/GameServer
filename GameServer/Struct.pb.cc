@@ -20,7 +20,10 @@ namespace Protocol {
 constexpr Player::Player(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , id_(uint64_t{0u}){}
+  , id_(uint64_t{0u})
+  , channel_(uint64_t{0u})
+  , chattype_(0)
+{}
 struct PlayerDefaultTypeInternal {
   constexpr PlayerDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -43,6 +46,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Struct_2eproto::offsets[] PROT
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::Protocol::Player, id_),
   PROTOBUF_FIELD_OFFSET(::Protocol::Player, name_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::Player, chattype_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::Player, channel_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Protocol::Player)},
@@ -53,15 +58,17 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014Struct.proto\022\010Protocol\032\nEnum.proto\"\"\n\006"
-  "Player\022\n\n\002id\030\001 \001(\004\022\014\n\004name\030\002 \001(\tb\006proto3"
+  "\n\014Struct.proto\022\010Protocol\032\nEnum.proto\"Y\n\006"
+  "Player\022\n\n\002id\030\001 \001(\004\022\014\n\004name\030\002 \001(\t\022$\n\010chat"
+  "Type\030\003 \001(\0162\022.Protocol.ChatType\022\017\n\007channe"
+  "l\030\004 \001(\004b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Struct_2eproto_deps[1] = {
   &::descriptor_table_Enum_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Struct_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Struct_2eproto = {
-  false, false, 80, descriptor_table_protodef_Struct_2eproto, "Struct.proto", 
+  false, false, 135, descriptor_table_protodef_Struct_2eproto, "Struct.proto", 
   &descriptor_table_Struct_2eproto_once, descriptor_table_Struct_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_Struct_2eproto::offsets,
   file_level_metadata_Struct_2eproto, file_level_enum_descriptors_Struct_2eproto, file_level_service_descriptors_Struct_2eproto,
@@ -94,13 +101,18 @@ Player::Player(const Player& from)
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
   }
-  id_ = from.id_;
+  ::memcpy(&id_, &from.id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&chattype_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(chattype_));
   // @@protoc_insertion_point(copy_constructor:Protocol.Player)
 }
 
 void Player::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-id_ = uint64_t{0u};
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&id_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&chattype_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(chattype_));
 }
 
 Player::~Player() {
@@ -131,7 +143,9 @@ void Player::Clear() {
   (void) cached_has_bits;
 
   name_.ClearToEmpty();
-  id_ = uint64_t{0u};
+  ::memset(&id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&chattype_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(chattype_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -154,6 +168,21 @@ const char* Player::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Protocol.Player.name"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .Protocol.ChatType chatType = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_chattype(static_cast<::Protocol::ChatType>(val));
+        } else goto handle_unusual;
+        continue;
+      // uint64 channel = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+          channel_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -202,6 +231,19 @@ failure:
         2, this->_internal_name(), target);
   }
 
+  // .Protocol.ChatType chatType = 3;
+  if (this->chattype() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      3, this->_internal_chattype(), target);
+  }
+
+  // uint64 channel = 4;
+  if (this->channel() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(4, this->_internal_channel(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -230,6 +272,19 @@ size_t Player::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64Size(
         this->_internal_id());
+  }
+
+  // uint64 channel = 4;
+  if (this->channel() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64Size(
+        this->_internal_channel());
+  }
+
+  // .Protocol.ChatType chatType = 3;
+  if (this->chattype() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_chattype());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -269,6 +324,12 @@ void Player::MergeFrom(const Player& from) {
   if (from.id() != 0) {
     _internal_set_id(from._internal_id());
   }
+  if (from.channel() != 0) {
+    _internal_set_channel(from._internal_channel());
+  }
+  if (from.chattype() != 0) {
+    _internal_set_chattype(from._internal_chattype());
+  }
 }
 
 void Player::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -297,7 +358,12 @@ void Player::InternalSwap(Player* other) {
       &name_, GetArenaForAllocation(),
       &other->name_, other->GetArenaForAllocation()
   );
-  swap(id_, other->id_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Player, chattype_)
+      + sizeof(Player::chattype_)
+      - PROTOBUF_FIELD_OFFSET(Player, id_)>(
+          reinterpret_cast<char*>(&id_),
+          reinterpret_cast<char*>(&other->id_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Player::GetMetadata() const {

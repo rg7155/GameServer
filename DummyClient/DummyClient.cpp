@@ -18,29 +18,41 @@ ClientServiceRef GService;
 void CheckCommand(const string& str)
 {
 	Protocol::C_COMMAND commandPkt;
-	commandPkt.set_msg(str);
+	//auto player = commandPkt.player(); //읽기 전용
+	auto player = commandPkt.mutable_player(); //쓰기 전용
 
-	//string command = str.substr(1);
-	//if (command.find("all") != string::npos)
-	//{
-	//	commandPkt.set_chattype(Protocol::CHAT_TYPE_ALL);
-	//	//cout << "Change All Mode" << endl;
-	//}
-	//else if (command.find("ch") != string::npos)
-	//{
-	//	commandPkt.set_chattype(Protocol::CHAT_TYPE_CHANNEL);
-	//	commandPkt.set_channel(str.back() - '0');
-	//	//cout << "Change Ch" << GPlayer->channelNum << " Mode" << endl;
-	//}
+	string command = str.substr(1);
+	auto type = Protocol::CHAT_TYPE_ALL;
+	auto channel = 0;
 
+	if (command.find("all") != string::npos)
+	{
+		type = Protocol::CHAT_TYPE_ALL;
+	}
+	else if (command.find("ch") != string::npos)
+	{
+		type = Protocol::CHAT_TYPE_CHANNEL;
+		channel = str.back() - '0';
+	}
+	player->set_chattype(type);
+	player->set_channel(channel);
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(commandPkt);
 	GService->Broadcast(sendBuffer);
 }
 void CheckChat(const string& str)
 {
+	ServerSessionRef serverSession = static_pointer_cast<ServerSession>(GService->GetSession());
+	PlayerRef playerRef = serverSession->GetPlayer();
+
 	Protocol::C_CHAT chatPkt;
 	chatPkt.set_msg(str);
+
+	auto playerPkt = chatPkt.mutable_player(); //쓰기 전용
 	//chatPkt.set_chattype(GPlayer->chatType);
+	playerPkt->set_id(playerRef->playerId);
+	playerPkt->set_name(playerRef->name);
+	playerPkt->set_chattype(playerRef->chatType);
+	playerPkt->set_channel(playerRef->channelNum);
 
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(chatPkt);
 	GService->Broadcast(sendBuffer);
@@ -49,8 +61,8 @@ void CheckChat(const string& str)
 int main()
 {
 	ServerPacketHandler::Init();
-	GPlayer = MakeShared<Player>();
-	GPlayer->chatType = Protocol::CHAT_TYPE_ALL;
+	//GPlayer = MakeShared<Player>();
+	//GPlayer->chatType = Protocol::CHAT_TYPE_ALL;
 
 	this_thread::sleep_for(1s);
 

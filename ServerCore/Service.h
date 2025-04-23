@@ -34,6 +34,7 @@ public:
 	void				ReleaseSession(SessionRef session);
 	int32				GetCurrentSessionCount() { return _sessionCount; }
 	int32				GetMaxSessionCount() { return _maxSessionCount; }
+	SessionRef			GetSession() { return *_sessions.begin();  }; // TODO
 
 public:
 	ServiceType			GetServiceType() { return _type; }

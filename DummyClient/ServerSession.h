@@ -14,7 +14,12 @@ public:
 	virtual void OnSend(int32 len) override;
 	virtual void OnDisconnected() override;
 
-public:
-	Vector<PlayerRef> _players;
+	PlayerRef	GetPlayer() { return _player; };
+	void		SetPlayer(PlayerRef player) { _player = player; };
+
+private:
+	//Vector<PlayerRef> _players;
+	PlayerRef _player;
+
 };
 

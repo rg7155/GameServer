@@ -18,26 +18,21 @@ message S_LOGIN
 
 message C_COMMAND
 {
-	string msg = 1;
+	Player player = 1; 
 }
 message S_COMMAND
 {
-	ChatType chatType = 1;
-	uint64 channel = 2;
+	Player player = 1;
 }
 
 message C_CHAT
 {
-	string msg = 1;
-	ChatType chatType = 2;
-	uint64 channel = 3;
-	uint64 playerId = 4;
+	Player player = 1;
+	string msg = 2;
 }
 
 message S_CHAT
 {
-	string msg = 1;
-	ChatType chatType = 2;
-	uint64 channel = 3;
-	uint64 playerId = 4;
+	Player player = 1;
+	string msg = 2;
 }
