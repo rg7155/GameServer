@@ -45,14 +45,20 @@ bool Handle_S_COMMAND(PacketSessionRef& session, Protocol::S_COMMAND& pkt)
 
 	auto player = pkt.player();
 
+	ServerSessionRef serverSession = static_pointer_cast<ServerSession>(session);
+	PlayerRef playerRef = serverSession->GetPlayer();
+
 	string chatType = "";
 	switch (player.chattype())
 	{
 	case Protocol::CHAT_TYPE_ALL:
 		chatType = "All";
+		playerRef->chatType = player.chattype();
 		break;
 	case Protocol::CHAT_TYPE_CHANNEL:
 		chatType = "Ch" + player.channel();
+		playerRef->chatType = player.chattype();
+		playerRef->channelNum = player.channel();
 		break;
 	default:
 		break;

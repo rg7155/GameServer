@@ -31,6 +31,9 @@ void Room::BroadcastChannel(SendBufferRef sendBuffer, uint64 channel)
 	WRITE_LOCK;
 	for (auto& p : _players)
 	{
+		if (p.second->chatType != Protocol::CHAT_TYPE_CHANNEL)
+			continue;
+		//cout << "BroadcastChannel id:" << p.second->playerId << "channelNum:" << p.second->channelNum << "chatType:" << p.second->chatType << endl;
 		if(p.second->channelNum == channel)
 			p.second->ownerSession->Send(sendBuffer);
 	}

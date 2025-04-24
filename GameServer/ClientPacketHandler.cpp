@@ -19,16 +19,11 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 
-	// TODO : Validation 체크
-
 	Protocol::S_LOGIN loginPkt;
 	loginPkt.set_success(true);
 
-	// DB에서 플레이 정보를 긁어온다
-	// GameSession에 플레이 정보를 저장 (메모리)
 
-	// ID 발급 (DB 아이디가 아니고, 인게임 아이디)
-	static Atomic<uint64> idGenerator = 1;
+	static Atomic<uint64> idGenerator = 0;
 
 	{
 		auto player = loginPkt.mutable_player();
@@ -48,12 +43,30 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	auto sendBuffer = ClientPacketHandler::MakeSendBuffer(loginPkt);
 	session->Send(sendBuffer);
 
+	//log
+	{
+		cout << "=======LOGIN=======" << endl;
+		cout << "ID:" << idGenerator << endl;
+		cout << "name:" << pkt.name() << endl;
+		cout << "==============" << endl;
+	}
+
 	return true;
 }
 
 bool Handle_C_COMMAND(PacketSessionRef& session, Protocol::C_COMMAND& pkt)
 {
-	//std::cout << "Command : " << pkt.msg() << endl;
+	//log
+	{
+		auto player = pkt.player();
+		cout << "=======COMMAND=======" << endl;
+		//cout << "ID:" << player.id() << "name:" <<player.name() << "chatType:" << player.chattype() << "channelNum:" << player.channel() << "msg:" << pkt.msg() << endl;
+		cout << "ID:" << player.id() << endl;
+		cout << "name:" << player.name() << endl;
+		cout << "chatType:" << player.chattype() << endl;
+		cout << "channelNum:" << player.channel() << endl;
+		cout << "==============" << endl;
+	}
 
 	//GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 	//PlayerRef player = gameSession->GetPlayer();
@@ -61,17 +74,18 @@ bool Handle_C_COMMAND(PacketSessionRef& session, Protocol::C_COMMAND& pkt)
 	auto player = pkt.player();
 
 	Protocol::S_COMMAND commandPkt;
+	commandPkt.mutable_player()->CopyFrom(pkt.player()); //  protobuf 메시지끼리의 deep copy 함수
+
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef playerRef = gameSession->GetPlayer();
 	if (player.chattype() == Protocol::CHAT_TYPE_ALL)
 	{
-		//player->chatType = Protocol::CHAT_TYPE_ALL;
-		player.set_chattype(Protocol::CHAT_TYPE_ALL);
+		playerRef->chatType = player.chattype();
 	}
 	else if (player.chattype() == Protocol::CHAT_TYPE_CHANNEL)
 	{
-		//player->chatType = Protocol::CHAT_TYPE_CHANNEL;
-		//player->channelNum = player.channel();
-		player.set_chattype(Protocol::CHAT_TYPE_CHANNEL);
-		player.set_channel(player.channel());
+		playerRef->chatType = player.chattype();
+		playerRef->channelNum = player.channel();
 	}
 	else
 	{
@@ -87,7 +101,18 @@ bool Handle_C_COMMAND(PacketSessionRef& session, Protocol::C_COMMAND& pkt)
 
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
-	std::cout << pkt.msg() << endl;
+	//log
+	{
+		auto player = pkt.player();
+		cout << "=======CHAT=======" << endl;
+		//cout << "ID:" << player.id() << "name:" <<player.name() << "chatType:" << player.chattype() << "channelNum:" << player.channel() << "msg:" << pkt.msg() << endl;
+		cout << "ID:" << player.id() << endl;
+		cout << "name:" << player.name() << endl;
+		cout << "chatType:" << player.chattype() << endl;
+		cout << "channelNum:" << player.channel() << endl;
+		cout << "msg:" << pkt.msg() << endl;
+		cout << "==============" << endl;
+	}
 
 	string str = pkt.msg();
 
