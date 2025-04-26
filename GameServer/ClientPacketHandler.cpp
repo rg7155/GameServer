@@ -6,7 +6,7 @@
 
 PacketHandlerFunc GPacketHandler[UINT16_MAX];
 
-// Á÷Á¢ ÄÁÅÙÃ÷ ÀÛ¾÷ÀÚ
+mutex logMutex;
 
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 {
@@ -17,22 +17,25 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 
 bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 {
+	lock_guard<mutex> lg(logMutex);
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 
 	Protocol::S_LOGIN loginPkt;
 	loginPkt.set_success(true);
 
-
 	static Atomic<uint64> idGenerator = 0;
 
 	{
+		string name = pkt.name();
+
 		auto player = loginPkt.mutable_player();
 		player->set_id(idGenerator);
-		player->set_name(pkt.name());
+		player->set_name(name);
 
 		PlayerRef playerRef = MakeShared<Player>();
 		playerRef->playerId = idGenerator++;
-		playerRef->name = pkt.name();
+		playerRef->name = name;
+
 		playerRef->ownerSession = gameSession;
 
 		gameSession->AddPlayer(playerRef);
@@ -47,7 +50,8 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	{
 		cout << "=======LOGIN=======" << endl;
 		cout << "ID:" << idGenerator << endl;
-		cout << "name:" << pkt.name() << endl;
+		cout << "Name:" << pkt.name() << endl;
+		cout << "Connected Client Count:" << idGenerator << endl;
 		cout << "==============" << endl;
 	}
 
@@ -102,17 +106,17 @@ bool Handle_C_COMMAND(PacketSessionRef& session, Protocol::C_COMMAND& pkt)
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
 	//log
-	{
-		auto player = pkt.player();
-		cout << "=======CHAT=======" << endl;
-		//cout << "ID:" << player.id() << "name:" <<player.name() << "chatType:" << player.chattype() << "channelNum:" << player.channel() << "msg:" << pkt.msg() << endl;
-		cout << "ID:" << player.id() << endl;
-		cout << "name:" << player.name() << endl;
-		cout << "chatType:" << player.chattype() << endl;
-		cout << "channelNum:" << player.channel() << endl;
-		cout << "msg:" << pkt.msg() << endl;
-		cout << "==============" << endl;
-	}
+	//{
+	//	auto player = pkt.player();
+	//	cout << "=======CHAT=======" << endl;
+	//	//cout << "ID:" << player.id() << "name:" <<player.name() << "chatType:" << player.chattype() << "channelNum:" << player.channel() << "msg:" << pkt.msg() << endl;
+	//	cout << "ID:" << player.id() << endl;
+	//	cout << "name:" << player.name() << endl;
+	//	cout << "chatType:" << player.chattype() << endl;
+	//	cout << "channelNum:" << player.channel() << endl;
+	//	cout << "msg:" << pkt.msg() << endl;
+	//	cout << "==============" << endl;
+	//}
 
 	string str = pkt.msg();
 

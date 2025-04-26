@@ -196,6 +196,7 @@ class C_LOGIN final :
 
   enum : int {
     kNameFieldNumber = 1,
+    kTestClientFieldNumber = 2,
   };
   // string name = 1;
   void clear_name();
@@ -211,6 +212,15 @@ class C_LOGIN final :
   std::string* _internal_mutable_name();
   public:
 
+  // bool testClient = 2;
+  void clear_testclient();
+  bool testclient() const;
+  void set_testclient(bool value);
+  private:
+  bool _internal_testclient() const;
+  void _internal_set_testclient(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.C_LOGIN)
  private:
   class _Internal;
@@ -219,6 +229,7 @@ class C_LOGIN final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+  bool testclient_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Protocol_2eproto;
 };
@@ -1024,6 +1035,26 @@ inline void C_LOGIN::set_allocated_name(std::string* name) {
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArenaForAllocation());
   // @@protoc_insertion_point(field_set_allocated:Protocol.C_LOGIN.name)
+}
+
+// bool testClient = 2;
+inline void C_LOGIN::clear_testclient() {
+  testclient_ = false;
+}
+inline bool C_LOGIN::_internal_testclient() const {
+  return testclient_;
+}
+inline bool C_LOGIN::testclient() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_LOGIN.testClient)
+  return _internal_testclient();
+}
+inline void C_LOGIN::_internal_set_testclient(bool value) {
+  
+  testclient_ = value;
+}
+inline void C_LOGIN::set_testclient(bool value) {
+  _internal_set_testclient(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_LOGIN.testClient)
 }
 
 // -------------------------------------------------------------------

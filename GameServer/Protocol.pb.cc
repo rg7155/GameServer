@@ -19,7 +19,8 @@ PROTOBUF_PRAGMA_INIT_SEG
 namespace Protocol {
 constexpr C_LOGIN::C_LOGIN(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
+  : name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , testclient_(false){}
 struct C_LOGINDefaultTypeInternal {
   constexpr C_LOGINDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -104,6 +105,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Protocol_2eproto::offsets[] PR
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::Protocol::C_LOGIN, name_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_LOGIN, testclient_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::S_LOGIN, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -140,11 +142,11 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Protocol_2eproto::offsets[] PR
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Protocol::C_LOGIN)},
-  { 6, -1, sizeof(::Protocol::S_LOGIN)},
-  { 13, -1, sizeof(::Protocol::C_COMMAND)},
-  { 19, -1, sizeof(::Protocol::S_COMMAND)},
-  { 25, -1, sizeof(::Protocol::C_CHAT)},
-  { 32, -1, sizeof(::Protocol::S_CHAT)},
+  { 7, -1, sizeof(::Protocol::S_LOGIN)},
+  { 14, -1, sizeof(::Protocol::C_COMMAND)},
+  { 20, -1, sizeof(::Protocol::S_COMMAND)},
+  { 26, -1, sizeof(::Protocol::C_CHAT)},
+  { 33, -1, sizeof(::Protocol::S_CHAT)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -158,14 +160,15 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\016Protocol.proto\022\010Protocol\032\nEnum.proto\032\014"
-  "Struct.proto\"\027\n\007C_LOGIN\022\014\n\004name\030\001 \001(\t\"<\n"
-  "\007S_LOGIN\022\017\n\007success\030\001 \001(\010\022 \n\006player\030\002 \001("
-  "\0132\020.Protocol.Player\"-\n\tC_COMMAND\022 \n\006play"
-  "er\030\001 \001(\0132\020.Protocol.Player\"-\n\tS_COMMAND\022"
-  " \n\006player\030\001 \001(\0132\020.Protocol.Player\"7\n\006C_C"
-  "HAT\022 \n\006player\030\001 \001(\0132\020.Protocol.Player\022\013\n"
-  "\003msg\030\002 \001(\t\"7\n\006S_CHAT\022 \n\006player\030\001 \001(\0132\020.P"
-  "rotocol.Player\022\013\n\003msg\030\002 \001(\tb\006proto3"
+  "Struct.proto\"+\n\007C_LOGIN\022\014\n\004name\030\001 \001(\t\022\022\n"
+  "\ntestClient\030\002 \001(\010\"<\n\007S_LOGIN\022\017\n\007success\030"
+  "\001 \001(\010\022 \n\006player\030\002 \001(\0132\020.Protocol.Player\""
+  "-\n\tC_COMMAND\022 \n\006player\030\001 \001(\0132\020.Protocol."
+  "Player\"-\n\tS_COMMAND\022 \n\006player\030\001 \001(\0132\020.Pr"
+  "otocol.Player\"7\n\006C_CHAT\022 \n\006player\030\001 \001(\0132"
+  "\020.Protocol.Player\022\013\n\003msg\030\002 \001(\t\"7\n\006S_CHAT"
+  "\022 \n\006player\030\001 \001(\0132\020.Protocol.Player\022\013\n\003ms"
+  "g\030\002 \001(\tb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Protocol_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -173,7 +176,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Protocol_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Protocol_2eproto = {
-  false, false, 355, descriptor_table_protodef_Protocol_2eproto, "Protocol.proto", 
+  false, false, 375, descriptor_table_protodef_Protocol_2eproto, "Protocol.proto", 
   &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 6,
   schemas, file_default_instances, TableStruct_Protocol_2eproto::offsets,
   file_level_metadata_Protocol_2eproto, file_level_enum_descriptors_Protocol_2eproto, file_level_service_descriptors_Protocol_2eproto,
@@ -206,11 +209,13 @@ C_LOGIN::C_LOGIN(const C_LOGIN& from)
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
   }
+  testclient_ = from.testclient_;
   // @@protoc_insertion_point(copy_constructor:Protocol.C_LOGIN)
 }
 
 void C_LOGIN::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+testclient_ = false;
 }
 
 C_LOGIN::~C_LOGIN() {
@@ -241,6 +246,7 @@ void C_LOGIN::Clear() {
   (void) cached_has_bits;
 
   name_.ClearToEmpty();
+  testclient_ = false;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -256,6 +262,13 @@ const char* C_LOGIN::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Protocol.C_LOGIN.name"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool testClient = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          testclient_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -298,6 +311,12 @@ failure:
         1, this->_internal_name(), target);
   }
 
+  // bool testClient = 2;
+  if (this->testclient() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(2, this->_internal_testclient(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -319,6 +338,11 @@ size_t C_LOGIN::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_name());
+  }
+
+  // bool testClient = 2;
+  if (this->testclient() != 0) {
+    total_size += 1 + 1;
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -355,6 +379,9 @@ void C_LOGIN::MergeFrom(const C_LOGIN& from) {
   if (!from.name().empty()) {
     _internal_set_name(from._internal_name());
   }
+  if (from.testclient() != 0) {
+    _internal_set_testclient(from._internal_testclient());
+  }
 }
 
 void C_LOGIN::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -383,6 +410,7 @@ void C_LOGIN::InternalSwap(C_LOGIN* other) {
       &name_, GetArenaForAllocation(),
       &other->name_, other->GetArenaForAllocation()
   );
+  swap(testclient_, other->testclient_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata C_LOGIN::GetMetadata() const {

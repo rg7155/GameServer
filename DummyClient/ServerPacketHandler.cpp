@@ -63,7 +63,7 @@ bool Handle_S_COMMAND(PacketSessionRef& session, Protocol::S_COMMAND& pkt)
 	default:
 		break;
 	}
-	std::cout << "Change Channel To " << chatType << "/" << player.name() << endl;
+	std::cout << "Change Channel To " << chatType << endl;
 
 	return true;
 }

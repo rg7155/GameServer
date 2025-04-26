@@ -11,6 +11,7 @@ void GameSession::OnConnected()
 
 void GameSession::OnDisconnected()
 {
+	cout << "Disconnect ID : " << _player->playerId << endl;
 	GSessionManager.Remove(static_pointer_cast<GameSession>(shared_from_this()));
 }
 
